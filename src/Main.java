@@ -1,72 +1,61 @@
 import personajes.Arquero;
-import personajes.Bardo;
 import personajes.Druida;
 import personajes.Guerrero;
-import personajes.Hechicero;
-import personajes.Mago;
 import personajes.Nigromante;
 import personajes.Personaje;
-import personajes.Sanador;
+import skills.GestorGremio;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== RPG — Expansión: Nuevas Clases ===\n");
+        GestorGremio gremio = new GestorGremio();
 
-        System.out.println("-- Error esperado --");
-        System.out.println("Personaje invalido = new Personaje(\"Error\");");
-        System.out.println("Error: Personaje is abstract; cannot be instantiated");
+        System.out.println("=== Bloque 1: Roster con ArrayList ===");
+        gremio.agregarMiembro(new Druida("Sylva", 10, 300, 100, "Bosque"));
+        gremio.agregarMiembro(new Nigromante("Malachar", 8, 250, 120, 4));
+        gremio.agregarMiembro(new Arquero("Legolas", 6, 150, "Arco", 20, 95));
+        gremio.agregarMiembro(new Guerrero("Thorin", 9, 400, 80, "Hacha"));
+        gremio.mostrarRoster();
 
-        Druida druida = new Druida("Sylva", 7, 180, 120, "Bosque");
-        Nigromante nigromante = new Nigromante("Malachar", 6, 220, 6, 4);
-        Bardo bardo = new Bardo("Finnian", 5, "Laúd", 30);
+        gremio.eliminarMiembro("Malachar");
+        gremio.mostrarRoster();
 
-        Guerrero guerrero = new Guerrero("Ragnar", 4, 180, 90, "Armadura de hierro");
-        Mago mago = new Mago("Gandalf", 5, 120, 140, "Fuego");
-        Arquero arquero = new Arquero("Legolas", 4, 160, "Arco largo", 35, 85);
-
-        System.out.println("\n-- Ataques y daño --");
-        Personaje[] equipo = { druida, nigromante, bardo };
-        for (Personaje p : equipo) {
-            p.atacar();
-            System.out.println("Daño: " + p.calcularDanio());
+        Personaje encontrado = gremio.buscarPorNombre("Legolas");
+        if (encontrado != null) {
+            System.out.println("Encontrado: " + encontrado.getNombre());
         }
 
-        System.out.println("\n-- Solo los Hechiceros lanzan hechizos --");
-        for (Personaje p : equipo) {
-            if (p instanceof Hechicero h) {
-                h.lanzarHechizo();
-            }
-        }
-        for (Personaje p : new Personaje[] { guerrero, mago, arquero }) {
-            if (p instanceof Hechicero h) {
-                h.lanzarHechizo();
-            }
-        }
+        System.out.println("\n=== Bloque 2: Cola de espera con LinkedList ===");
+        gremio.encolarSolicitante("Gandalf");
+        gremio.encolarSolicitante("Aragorn");
+        gremio.encolarSolicitante("Gimli");
+        gremio.mostrarCola();
 
-        System.out.println("\n-- Solo los Sanadores curan --");
-        nigromante.recibirDanio(300);
-        System.out.println("Malachar recibe 300 de daño. Vida: " + nigromante.getPuntovida());
+        gremio.atenderSiguiente();
+        gremio.mostrarCola();
 
-        Personaje[] aliados = { druida, nigromante, bardo, guerrero, mago, arquero };
-        for (Personaje p : aliados) {
-            if (p instanceof Sanador s && p != nigromante) {
-                s.curarAliado(nigromante);
-            }
-        }
+        System.out.println("\n=== Bloque 3: Inventario con HashMap ===");
+        gremio.agregarItem("Poción de vida", 5);
+        gremio.agregarItem("Flecha élfica", 30);
+        gremio.agregarItem("Poción de vida", 3);
+        gremio.mostrarInventario();
 
-        System.out.println("\n-- Integración con clases originales --");
-        Personaje[] equipoOriginal = { guerrero, mago, arquero };
-        for (Personaje p : equipoOriginal) {
-            p.atacar();
-            System.out.println("Daño: " + p.calcularDanio());
-        }
+        gremio.usarItem("Poción de vida");
+        gremio.usarItem("Pergamino de fuego");
+        gremio.mostrarInventario();
 
-        System.out.println("\n-- Estado final --");
-        System.out.println("Nombre: " + druida.getNombre() + "    | Nivel: " + druida.getNivel() + " | Vida: " + druida.getPuntovida() + " | Vivo: " + (druida.isEstaVivo() ? "Sí" : "No"));
-        System.out.println("Nombre: " + nigromante.getNombre() + " | Nivel: " + nigromante.getNivel() + " | Vida: " + nigromante.getPuntovida() + " | Vivo: " + (nigromante.isEstaVivo() ? "Sí" : "No"));
-        System.out.println("Nombre: " + bardo.getNombre() + "  | Nivel: " + bardo.getNivel() + " | Vida: " + bardo.getPuntovida() + " | Vivo: " + (bardo.isEstaVivo() ? "Sí" : "No"));
-        System.out.println("Nombre: " + guerrero.getNombre() + " | Nivel: " + guerrero.getNivel() + " | Vida: " + guerrero.getPuntovida() + " | Vivo: " + (guerrero.isEstaVivo() ? "Sí" : "No"));
-        System.out.println("Nombre: " + mago.getNombre() + "    | Nivel: " + mago.getNivel() + " | Vida: " + mago.getPuntovida() + " | Vivo: " + (mago.isEstaVivo() ? "Sí" : "No"));
-        System.out.println("Nombre: " + arquero.getNombre() + "  | Nivel: " + arquero.getNivel() + " | Vida: " + arquero.getPuntovida() + " | Vivo: " + (arquero.isEstaVivo() ? "Sí" : "No"));
+        System.out.println("\n=== Bloque 4: Habilidades únicas con HashSet ===");
+        gremio.registrarHabilidad("Curación");
+        gremio.registrarHabilidad("Magia oscura");
+        gremio.registrarHabilidad("Curación");
+        gremio.mostrarHabilidades();
+
+        System.out.println("¿Tiene flecha? " + gremio.tieneHabilidad("Tiro con arco"));
+        System.out.println("¿Tiene curación? " + gremio.tieneHabilidad("Curación"));
+
+        System.out.println("\n=== Bloque 5: Resumen del gremio ===");
+        gremio.mostrarRoster();
+        gremio.mostrarCola();
+        gremio.mostrarInventario();
+        gremio.mostrarHabilidades();
     }
 }
