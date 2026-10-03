@@ -1,5 +1,9 @@
 package personajes;
 
+import exception.PersonajeDerrotadoException;
+import exception.RecursoInsuficienteException;
+import exception.RpgException;
+
 public class Nigromante extends Personaje implements Hechicero {
     private int mana;
     private int almasAbsorbidas;
@@ -17,7 +21,16 @@ public class Nigromante extends Personaje implements Hechicero {
     }
 
     @Override
-    public void atacar() {
+    public void atacar() throws RpgException {
+        if (!isEstaVivo()) {
+            throw new PersonajeDerrotadoException(getNombre());
+        }
+
+        if (mana < 15) {
+            throw new RecursoInsuficienteException("mana", mana);
+        }
+
+        mana -= 15;
         System.out.println("[" + nombre + "] drena la esencia vital.");
     }
 

@@ -1,5 +1,9 @@
 package personajes;
 
+import exception.PersonajeDerrotadoException;
+import exception.RecursoInsuficienteException;
+import exception.RpgException;
+
 public class Arquero extends Personaje {
     private int flechasDisponibles;
     private int precision;
@@ -35,12 +39,18 @@ public class Arquero extends Personaje {
     }
 
     @Override
-    public void atacar() {
-        if (flechasDisponibles > 0) {
-            flechasDisponibles--;
+    public void atacar() throws RpgException {
+        if (!isEstaVivo()) {
+            throw new PersonajeDerrotadoException(getNombre());
         }
-        System.out.println("[" + getNombre() + "] ataca con un golpe básico.");
-        System.out.println(getNombre() + " dispara una flecha. Flechas restantes: " + flechasDisponibles);
+
+        if (flechasDisponibles <= 0) {
+            throw new RecursoInsuficienteException("flechas", flechasDisponibles);
+        }
+
+        flechasDisponibles--;
+        System.out.println("[" + getNombre() + "] dispara una flecha. " +
+                           "Flechas restantes: " + flechasDisponibles);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package skills;
 
 import java.util.ArrayList;
+
+import exception.RpgException;
 import personajes.Personaje;
 
 public class GestorBatalla {
@@ -10,7 +12,7 @@ public class GestorBatalla {
         this.historial = new ArrayList<>();
     }
 
-    public void ejecutarAtaque(Personaje atacante) {
+    public void ejecutarAtaque(Personaje atacante) throws RpgException {
         int danio = atacante.calcularDanio();
         atacante.atacar();
         String evento = "[BATALLA] " + atacante.getNombre() + " ataca solo → daño: " + danio;
@@ -18,7 +20,7 @@ public class GestorBatalla {
         System.out.println(evento);
     }
 
-    public void ejecutarAtaque(Personaje atacante, Personaje defensor) {
+    public void ejecutarAtaque(Personaje atacante, Personaje defensor) throws RpgException {
         int danio = atacante.calcularDanio();
         atacante.atacar();
         defensor.recibirDanio(danio);
@@ -33,7 +35,7 @@ public class GestorBatalla {
         System.out.println(evento);
     }
 
-    public void ejecutarAtaque(Personaje[] equipo) {
+    public void ejecutarAtaque(Personaje[] equipo) throws RpgException {
         String nombres = "";
         for (int i = 0; i < equipo.length; i++) {
             if (equipo[i] != null) {

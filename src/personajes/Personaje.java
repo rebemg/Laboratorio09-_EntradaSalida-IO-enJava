@@ -1,4 +1,7 @@
 package personajes;
+
+import exception.AccionInvalidaException;
+import exception.RpgException;
 import skills.Combatiente;
 
 public abstract class Personaje implements Combatiente {
@@ -35,7 +38,7 @@ public abstract class Personaje implements Combatiente {
     }
 
     @Override
-    public abstract void atacar();
+    public abstract void atacar() throws RpgException;
 
     @Override
     public String defender() {
@@ -44,7 +47,13 @@ public abstract class Personaje implements Combatiente {
 
     public abstract int calcularDanio();
 
-    public void recibirDanio(int danio) {
+    public void recibirDanio(int danio) throws AccionInvalidaException {
+        if (danio < 0) {
+            throw new AccionInvalidaException(
+                "recibirDanio",
+                "El daño no puede ser negativo: " + danio
+            );
+        }
         puntovida -= danio;
         if (puntovida <= 0) {
             puntovida = 0;

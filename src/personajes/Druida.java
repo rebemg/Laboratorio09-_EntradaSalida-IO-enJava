@@ -1,5 +1,11 @@
 package personajes;
 
+import exception.PersonajeDerrotadoException;
+import exception.AccionInvalidaException;
+import exception.PersonajeNuloException;
+import exception.RecursoInsuficienteException;
+import exception.RpgException;
+
 public class Druida extends Personaje implements Hechicero, Sanador {
     private int mana;
     private int poderCuracion;
@@ -17,7 +23,16 @@ public class Druida extends Personaje implements Hechicero, Sanador {
     }
 
     @Override
-    public void atacar() {
+    public void atacar() throws RpgException {
+        if (!isEstaVivo()) {
+            throw new PersonajeDerrotadoException(getNombre());
+        }
+
+        if (mana < 10) {
+            throw new RecursoInsuficienteException("mana", mana);
+        }
+
+        mana -= 10;
         System.out.println("[" + nombre + "] invoca raíces del bosque.");
     }
 
@@ -37,10 +52,16 @@ public class Druida extends Personaje implements Hechicero, Sanador {
     }
 
     @Override
-    public void curarAliado(Personaje aliado) {
+    public void curarAliado(Personaje aliado) throws RpgException {
         if (aliado == null) {
-            System.out.println(nombre + " no puede curar a un aliado nulo.");
-            return;
+            throw new PersonajeNuloException("curarAliado");
+        }
+
+        if (!aliado.isEstaVivo()) {
+            throw new AccionInvalidaException(
+                "curarAliado",
+                "No se puede curar a un personaje derrotado"
+            );
         }
 
         aliado.puntovida += poderCuracion;
