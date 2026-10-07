@@ -1,101 +1,69 @@
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import personajes.Arquero;
 import personajes.Druida;
 import personajes.Guerrero;
-import personajes.Nigromante;
 import personajes.Personaje;
-import exception.AccionInvalidaException;
-import exception.RpgException;
-import skills.GestorGremio;
-import skills.MotorCombate;
+import skills.PersistenciaGremio;
 
 public class Main {
-    public static void main(String[] args) throws RpgException {
-        GestorGremio gremio = new GestorGremio();
-
-        System.out.println("=== Bloque 1: Roster con ArrayList ===");
-        gremio.agregarMiembro(new Druida("Sylva", 10, 300, 100, "Bosque"));
-        gremio.agregarMiembro(new Nigromante("Malachar", 8, 250, 120, 4));
-        gremio.agregarMiembro(new Arquero("Legolas", 6, 150, "Arco", 20, 95));
-        gremio.agregarMiembro(new Guerrero("Thorin", 9, 400, 80, "Hacha"));
-        gremio.mostrarRoster();
-
-        gremio.eliminarMiembro("Malachar");
-        gremio.mostrarRoster();
-
-        Personaje encontrado = gremio.buscarPorNombre("Legolas");
-        if (encontrado != null) {
-            System.out.println("Encontrado: " + encontrado.getNombre());
-        }
-
-        System.out.println("\n=== Bloque 2: Cola de espera con LinkedList ===");
-        gremio.encolarSolicitante("Gandalf");
-        gremio.encolarSolicitante("Aragorn");
-        gremio.encolarSolicitante("Gimli");
-        gremio.mostrarCola();
-
-        gremio.atenderSiguiente();
-        gremio.mostrarCola();
-
-        System.out.println("\n=== Bloque 3: Inventario con HashMap ===");
-        gremio.agregarItem("Poción de vida", 5);
-        gremio.agregarItem("Flecha élfica", 30);
-        gremio.agregarItem("Poción de vida", 3);
-        gremio.mostrarInventario();
-
-        gremio.usarItem("Poción de vida");
-        gremio.usarItem("Pergamino de fuego");
-        gremio.mostrarInventario();
-
-        System.out.println("\n=== Bloque 4: Habilidades únicas con HashSet ===");
-        gremio.registrarHabilidad("Curación");
-        gremio.registrarHabilidad("Magia oscura");
-        gremio.registrarHabilidad("Curación");
-        gremio.mostrarHabilidades();
-
-        System.out.println("¿Tiene flecha? " + gremio.tieneHabilidad("Tiro con arco"));
-        System.out.println("¿Tiene curación? " + gremio.tieneHabilidad("Curación"));
-
-        System.out.println("\n=== Bloque 5: Resumen del gremio ===");
-        gremio.mostrarRoster();
-        gremio.mostrarCola();
-        gremio.mostrarInventario();
-        gremio.mostrarHabilidades();
-
-        System.out.println("\n=== Bloque 6: Manejo de excepciones en combate ===");
-        Druida druida = new Druida("Sylva", 10, 30, 100, "Bosque");
-        Nigromante nigromante = new Nigromante("Malachar", 8, 40, 120, 4);
-        Druida druida2 = new Druida("Lyria", 7, 25, 50, "Ciervo");
-        MotorCombate motor = new MotorCombate();
-
-        System.out.println("\n--- Escenario 1: Turno normal ---");
-        motor.ejecutarTurno(druida, nigromante);
-
-        System.out.println("\n--- Escenario 2: Personaje derrotado ---");
-        druida.recibirDanio(9999);
-        motor.ejecutarTurno(druida, nigromante);
-
-        System.out.println("\n--- Escenario 3: Arquero sin flechas ---");
-        Arquero sinFlechas = new Arquero("Legolas", 6, 0, "Arco Largo", 150, 95);
-        motor.ejecutarTurno(sinFlechas, nigromante);
-
-        System.out.println("\n--- Escenario 4: Curar aliado derrotado ---");
-        Personaje personajeDerrotado = druida;
+    public static void main(String[] args) {
         try {
-            druida2.curarAliado(personajeDerrotado);
-        } catch (RpgException e) {
-            System.out.println("No se pudo curar: " + e.getMessage());
-        }
 
-        System.out.println("\n--- Escenario 5: Daño negativo con finally ---");
-        try {
-            nigromante.recibirDanio(-50);
-        } catch (AccionInvalidaException e) {
-            System.out.println("Capturado: " + e.getMessage());
-        } finally {
-            System.out.println("El bloque finally siempre se ejecuta.");
-        }
+            PersistenciaGremio persistencia = new PersistenciaGremio();
 
-        System.out.println("\n--- Escenario 6: Bitácora completa ---");
-        motor.mostrarBitacora();
+            ArrayList<Personaje> roster = new ArrayList<>();
+            roster.add(new Druida("Sylva", 10, 300, 100, "Bosque"));
+            roster.add(new Arquero("Legolas", 6, 150, "Arco", 20, 95));
+            roster.add(new Guerrero("Thorin", 9, 400, 80, "Hacha"));
+
+            persistencia.guardarRoster(roster);
+
+            ArrayList<String> lineasRoster = persistencia.cargarRoster();
+            System.out.println("\n=== Roster cargado desde archivo ===");
+            for (String linea : lineasRoster) {
+                String[] partes = linea.split(",");
+                System.out.println("Nombre: " + partes[0] +
+                                   " | Nivel: " + partes[1] +
+                                   " | Vida: " + partes[2]);
+            }
+
+            HashMap<String, Integer> inventario = new HashMap<>();
+            inventario.put("Poción de vida", 8);
+            inventario.put("Flecha élfica", 30);
+            inventario.put("Pergamino de fuego", 3);
+
+            persistencia.guardarInventario(inventario);
+
+            HashMap<String, Integer> inventarioCargado =
+                persistencia.cargarInventario();
+
+            System.out.println("\n=== Inventario cargado desde archivo ===");
+            for (Map.Entry<String, Integer> e : inventarioCargado.entrySet()) {
+                System.out.println(e.getKey() + " → " + e.getValue());
+            }
+
+            persistencia.agregarEntradaBitacora("Sylva atacó a Malachar (daño: 240)");
+            persistencia.agregarEntradaBitacora("Legolas sin flechas — no pudo atacar");
+            persistencia.agregarEntradaBitacora("Thorin venció a Dragón de Hielo");
+
+            persistencia.mostrarBitacora();
+
+            File carpeta = new File("datos_gremio");
+            System.out.println("\n=== Archivos en datos_gremio/ ===");
+            File[] archivos = carpeta.listFiles();
+            if (archivos != null) {
+                for (File archivo : archivos) {
+                    System.out.println(archivo.getName() +
+                                       " (" + archivo.length() + " bytes)");
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error de archivo: " + e.getMessage());
+        }
     }
 }
